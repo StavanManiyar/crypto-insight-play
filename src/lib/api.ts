@@ -228,45 +228,29 @@ function getHorizonFromInterval(interval: Interval): string {
   return map[interval];
 }
 
-// API client
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
+// API client for mock data
 class ApiClient {
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const url = endpoint.startsWith('http') ? endpoint : `/api${endpoint}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      ...options,
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    
-    return response.json();
-  }
-  
   async getCandles(symbol: string, interval: Interval): Promise<Candle[]> {
-    return this.request(`/market/candles?symbol=${symbol}&interval=${interval}`);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 400));
+    return generateMockCandles(symbol, interval);
   }
   
   async getSignals(symbol: string, interval: Interval): Promise<Signal[]> {
-    return this.request(`/signals?symbol=${symbol}&interval=${interval}`);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 400));
+    const candles = generateMockCandles(symbol, interval, 100);
+    return generateMockSignals(symbol, interval, candles);
   }
   
   async runBacktest(request: BacktestRequest): Promise<BacktestResult> {
-    return this.request('/backtest', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    return generateMockBacktest(request);
   }
   
   async getLeaderboard(): Promise<LeaderRow[]> {
-    return this.request('/leaderboard');
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 400));
+    return generateMockLeaderboard();
   }
 }
 
